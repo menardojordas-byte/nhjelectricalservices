@@ -132,7 +132,11 @@ html{background:var(--bg)}body{background:transparent}
 .mbox input[hidden]{display:none}
 .pt{width:100%;border-collapse:collapse;font-size:.85rem;min-width:820px}
 .pt th{text-align:left;color:var(--mut);font-weight:600;padding:6px 4px;white-space:nowrap}
+#payroll h1{text-align:center}
+#payBody .pt th{text-align:center;vertical-align:middle}
 .pt td{padding:4px}
+.pt input.aw{width:auto;min-width:6ch;max-width:none}
+.pt td.nw{white-space:nowrap;width:1%}
 .pt input{width:100%;min-width:5rem;font:inherit;padding:7px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
 .pt .x{height:32px;width:32px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:#c0392b;cursor:pointer}
 .pnote{font-size:.8rem;color:var(--mut);margin:0 0 12px}
@@ -231,7 +235,6 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
 <div class="stat"><div class="n"><span id="cnt">0</span>+</div><div><b>Completed projects</b><small>Homes, buildings and solar installations powered by NHJ</small></div></div>
 
 <h2 class="sec-h" style="color:var(--fg)">Solar packages &amp; pricing</h2>
-<p class="sec-s">Complete installed prices. Savings are estimated at 70% system efficiency and update with the electricity rate and sun hours in the calculator below.</p>
 <div class="addbar" id="pkAdm" hidden><button class="btn" id="pkAdd">＋ Add package</button><button class="btn o" id="pkReset">Reset packages &amp; pictures</button><span style="font-size:.8rem;color:var(--mut);align-self:center;flex:1;min-width:200px">Admin: edit the name, capacity (kW) and type on any card. Price = capacity × installed cost per kW (admin block in the Solar calculator) + the card's % markup (Mini = 10%). Panels, price, savings, payback and the picture update automatically. ⭐ = most popular.</span></div>
 <div class="pk" id="pk"></div>
 
@@ -251,7 +254,7 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
     <small style="color:var(--mut)">🔒 Admin only</small>
     <label>Solar panel wattage (W) – pick or type your own</label><input type="number" id="pw" value="630" min="100" max="1000" step="5" list="pws">
     <datalist id="pws"><option value="400"><option value="450"><option value="500"><option value="550"><option value="580"><option value="600"><option value="620"><option value="650"><option value="700"></datalist>
-    <label>Installed cost per kW (₱)</label><input type="number" id="cpk" value="62000" step="1000" min="0">
+    <label>Installed cost per kW (₱)</label><input type="number" id="cpk" value="60000" step="1000" min="0">
     
    </div>
    <label>Bill to offset with solar: <b id="vOff"></b></label><input type="range" id="off" min="30" max="100" value="80">
@@ -389,12 +392,13 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
   <p class="pnote">Payroll data is saved only in this browser on this device. It is never part of the public web page. Use “Export CSV” to keep a backup.</p>
   <div class="addbar">
    <input id="prPeriod" placeholder="Pay period, e.g. Sep 16–30, 2026" style="font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg);min-width:240px">
-   <label style="margin:0;display:flex;align-items:center;gap:6px;font-size:.85rem">OT rate ×<input id="prOt" type="number" step="0.05" min="0" value="1.25" style="width:5rem;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)"></label>
+   <details style="flex:1 1 100%"><summary style="cursor:pointer;font-size:.85rem;font-weight:600">Overtime &amp; premium rates (× hourly rate = daily rate ÷ 8) – editable</summary><div id="prRates" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:8px"></div></details>
+   <details style="flex:1 1 100%"><summary style="cursor:pointer;font-size:.85rem;font-weight:600">Government deductions, 13th month &amp; pay frequency – editable</summary><div id="prGov" style="margin-top:8px"></div></details>
    <button class="btn" id="prAdd">＋ Add employee</button><button class="btn o" id="prCsv">Export CSV</button><button class="btn o" id="prPw">Change password</button>
   </div>
   <div id="payBody" style="overflow:auto"></div>
   <div class="kpis" id="payTot" style="margin-top:14px"></div>
-  <p class="pnote">Gross = daily rate × days + overtime (daily rate ÷ 8 × OT rate × OT hours) + allowance. Net = gross − deductions.</p>
+  <p class="pnote"><b>Gross</b> = daily rate × days + overtime/premium pay + food allowance (per day × days) + bonus + 13th month pay. <b>Net</b> = gross − SSS − PhilHealth − Pag-IBIG − withholding tax − other deduction. Government contributions use the employee share on a monthly estimate (this period's basic + overtime pay × pay periods per month) and are split across the periods in a month. Withholding tax uses the TRAIN monthly table on that estimate after contributions; food allowance, bonus and 13th month pay are treated as non-taxable up to the ₱90,000 yearly exemption. 13th month pay = total basic salary earned in the year ÷ 12 (enter it per employee). Rates and tables are guides – verify with SSS, PhilHealth, Pag-IBIG and BIR before paying.</p>
  </div>
 </div>
 
@@ -525,7 +529,7 @@ $('pk').onclick=e=>{const T=s=>e.target.closest(s);let x;
  if(x=T('[data-add]')){addCart(+x.dataset.add);return}
  if(x=T('[data-pk]')){const p=PK[x.dataset.pk];go('contact');$('cs').value='Solar installation';$('cm').value='I am interested in the '+p[0]+' package ('+p[1]+' kW).'}};
 $('pkAdd').onclick=()=>{PK.push(['New package',5,['','Smart inverter + monitoring','Wiring &amp; mounting','Permit assistance'],'Custom',0]);saveCfg();pkgs();const k=$('pk').lastElementChild;if(k){k.scrollIntoView({block:'nearest'});k.querySelector('input').select()}};
-$('pkReset').onclick=()=>{PK.length=0;DEFPK.forEach(p=>PK.push(JSON.parse(JSON.stringify(p))));POP=0;PKIMG={};cart={};$('cpk').value=62000;$('pw').value=630;$('sun').value=3;calc();saveCfg();savePK();saveCart();pkgs();toast('Packages reset to defaults')};
+$('pkReset').onclick=()=>{PK.length=0;DEFPK.forEach(p=>PK.push(JSON.parse(JSON.stringify(p))));POP=0;PKIMG={};cart={};$('cpk').value=60000;$('pw').value=630;$('sun').value=3;calc();saveCfg();savePK();saveCart();pkgs();toast('Packages reset to defaults')};
 
 // Cart
 let cart={};try{cart=JSON.parse(localStorage.getItem('nhjc2')||'{}')}catch(e){}
@@ -551,10 +555,10 @@ $('sv').onclick=e=>{const b=e.target.closest('[data-sv]');if(!b)return;const s=S
 const BAKED={};/*B*/
 let PKIMG=Object.assign({},BAKED);try{const l=localStorage.getItem('nhj_pk');if(l)PKIMG=JSON.parse(l)}catch(e){}
 const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/
-(function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
+(function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==3&&l.cpk===62000)delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
 $('cpk').addEventListener('input',()=>saveCfg());$('pw').addEventListener('input',()=>saveCfg());$('sun').addEventListener('input',()=>{if(isAdmin)saveCfg()});
 function flashSaved(){const el=$('saveStat');if(!el)return;const d=new Date();el.textContent='✓ Saved '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-function saveCfg(){try{localStorage.setItem('nhj_pkc',JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||62000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2}));flashSaved()}catch(e){toast('Browser storage unavailable – changes not saved')}}
+function saveCfg(){try{localStorage.setItem('nhj_pkc',JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:3}));flashSaved()}catch(e){toast('Browser storage unavailable – changes not saved')}}
 let upIdx=0,isAdmin=false,mMode='';try{isAdmin=sessionStorage.getItem('nhj_a')==='1'}catch(e){}
 function savePK(){try{localStorage.setItem('nhj_pk',JSON.stringify(PKIMG));flashSaved()}catch(e){toast('Browser storage is full – picture kept for this visit only')}}
 function saveFile(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('If nothing downloads, open the hosted page directly – previews can block downloads')}
@@ -579,23 +583,49 @@ $('saveSite').onclick=()=>{const c=document.documentElement.cloneNode(true);
  c.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='home'));
  c.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p==='home'));
  c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
- const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||62000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2})+';/*C*/');
+ const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:3})+';/*C*/');
  saveFile('index.html','<!DOCTYPE html>\n'+c.outerHTML,'text/html')};
 
-let PAY={period:'',ot:1.25,emps:[]};try{Object.assign(PAY,JSON.parse(localStorage.getItem('nhj_pay')||'{}'))}catch(e){}
+const PT=[['ot','Regular OT','Ordinary day, beyond 8 hrs',1.25],['rd','Rest day / special day','First 8 hrs worked',1.30],['rdot','Rest day / special day OT','Beyond 8 hrs',1.69],['srd','Special day on rest day','First 8 hrs worked',1.50],['srdot','Special day on rest day OT','Beyond 8 hrs',1.95],['rh','Regular holiday','First 8 hrs worked',2.00],['rhot','Regular holiday OT','Beyond 8 hrs',2.60],['rhrd','Regular holiday on rest day','First 8 hrs worked',2.60],['rhrdot','Regular holiday on rest day OT','Beyond 8 hrs',3.38],['dh','Double holiday','First 8 hrs worked',3.00],['dhot','Double holiday OT','Beyond 8 hrs',3.90],['nd','Night differential (10 pm–6 am)','Add-on to hourly rate',0.10]];
+const PH={ot:'Reg OT',rd:'Rest / Special day',rdot:'Rest / Special OT',srd:'Special on rest day',srdot:'Special on rest OT',rh:'Reg holiday',rhot:'Reg holiday OT',rhrd:'Reg hol. on rest day',rhrdot:'Reg hol. rest OT',dh:'Double holiday',dhot:'Double hol. OT',nd:'Night diff'};
+let PAY={period:'',rates:{},emps:[]};try{const sv=JSON.parse(localStorage.getItem('nhj_pay')||'{}');Object.assign(PAY,sv);if(sv.ot&&!(sv.rates&&sv.rates.ot)){PAY.rates=Object.assign({},sv.rates,{ot:sv.ot})}}catch(e){}
+PT.forEach(t=>{if(typeof PAY.rates[t[0]]!=='number')PAY.rates[t[0]]=t[3]});
+const GD={sssRate:5,sssMin:5000,sssMax:35000,phRate:2.5,phMin:10000,phMax:100000,piRate:2,piCap:10000};
+PAY.g=Object.assign({},GD,PAY.g||{});if(!PAY.ppm)PAY.ppm=2;if(PAY.th===undefined)PAY.th=false;
+PAY.emps.forEach(e=>{if(!e.h){e.h={};if(e.ot)e.h.ot=e.ot}if(e.fa===undefined){e.fa=e.d>0&&e.al?Math.round(e.al/e.d*100)/100:0}});
+const ST=['Permanent','Contractual','OJT','Project Base','Provisionary'];
+const nextNo=()=>{let m=0;PAY.emps.forEach(e=>{const x=/(\d+)\s*$/.exec(e.no||'');if(x)m=Math.max(m,+x[1])});return 'NHJ-'+String(m+1).padStart(3,'0')};
+PAY.emps.forEach(e=>{if(!e.no)e.no=nextNo();if(!e.st)e.st='Permanent'});
+PAY.emps.forEach(e=>{if(e.bn===undefined)e.bn=0;if(e.yb===undefined)e.yb=0;if(e.gv===undefined)e.gv=true});
 function paySave(){try{localStorage.setItem('nhj_pay',JSON.stringify(PAY));flashSaved()}catch(e){toast('Could not save payroll in this browser')}}
-const calcP=e=>{const g=e.r*e.d+(e.r/8)*PAY.ot*e.ot+e.al;return [g,g-e.de]};
-function payRender(){$('prPeriod').value=PAY.period;$('prOt').value=PAY.ot;
- $('payBody').innerHTML=PAY.emps.length?`<table class="pt"><thead><tr><th>Employee</th><th>Position</th><th>Daily rate</th><th>Days</th><th>OT hrs</th><th>Allowance</th><th>Deductions</th><th>Gross</th><th>Net pay</th><th></th></tr></thead><tbody>${PAY.emps.map((e,i)=>`<tr><td><input data-i="${i}" data-f="n" value="${esc(e.n)}"></td><td><input data-i="${i}" data-f="p" value="${esc(e.p)}"></td>${['r','d','ot','al','de'].map(f=>`<td><input type="number" min="0" step="any" data-i="${i}" data-f="${f}" value="${e[f]}"></td>`).join('')}<td id="pg${i}"></td><td id="pn${i}" style="font-weight:700"></td><td><button class="x" data-pdel="${i}" aria-label="Remove">✕</button></td></tr>`).join('')}</tbody></table>`:'<p style="color:var(--mut)">No employees yet. Click “Add employee”.</p>';payTot()}
-function payTot(){let G=0,N=0;PAY.emps.forEach((e,i)=>{const [g,n]=calcP(e);G+=g;N+=n;const a=$('pg'+i),b=$('pn'+i);if(a){a.textContent=peso(g);b.textContent=peso(n)}});
- $('payTot').innerHTML=[['Employees',PAY.emps.length],['Total gross',peso(G)],['Total net pay',peso(N)]].map(([l,v])=>`<div class="card k b"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}
-$('payBody').addEventListener('input',e=>{const t=e.target,f=t.dataset.f;if(!f)return;PAY.emps[t.dataset.i][f]=(f==='n'||f==='p')?t.value:Math.max(0,+t.value||0);paySave();payTot()});
+const TAXM=x=>x<=20833?0:x<=33333?(x-20833)*.15:x<=66667?1875+(x-33333)*.2:x<=166667?8541.8+(x-66667)*.25:x<=666667?33541.8+(x-166667)*.3:183541.8+(x-666667)*.35;
+function det(e){const hr=e.r/8,h=e.h||{},G=PAY.g,pm=PAY.ppm||1;let prem=0;PT.forEach(t=>{prem+=hr*PAY.rates[t[0]]*(+h[t[0]]||0)});
+ const basic=e.r*e.d,fa=(e.fa||0)*e.d,bn=e.bn||0,th=PAY.th?(e.yb||0)/12:0,reg=basic+prem,gross=reg+fa+bn+th;
+ let sss=0,ph=0,pi=0,tax=0;
+ if(e.gv!==false&&reg>0){const mb=reg*pm,msc=Math.min(G.sssMax,Math.max(G.sssMin,Math.round(mb/500)*500));sss=msc*G.sssRate/100/pm;
+  ph=Math.min(G.phMax,Math.max(G.phMin,mb))*G.phRate/100/pm;pi=Math.min(mb,G.piCap)*G.piRate/100/pm;
+  const mt=Math.max(0,mb-(sss+ph+pi)*pm),ex=Math.max(0,bn+th-90000);tax=(TAXM(mt)+(ex?TAXM(mt+ex)-TAXM(mt):0))/pm}
+ const td=sss+ph+pi+tax+(e.de||0);return {gross,fa,bn,th,sss,ph,pi,tax,td,net:gross-td}}
+const calcP=e=>{const d=det(e);return [d.gross,d.net]};
+function payRender(){$('prPeriod').value=PAY.period;
+ $('prRates').innerHTML=PT.map(t=>`<label style="margin:0;display:flex;align-items:center;gap:6px;font-size:.8rem"><span style="flex:1">${t[1]}<br><small style="color:var(--mut)">${t[2]}</small></span>${t[0]==='nd'?'+':'×'}<input type="number" step="0.01" min="0" data-rate="${t[0]}" value="${PAY.rates[t[0]]}" style="width:4.8rem;font:inherit;padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)"></label>`).join('');
+ const G=PAY.g,gi=(k,l,u)=>`<label style="margin:0;display:flex;align-items:center;gap:6px;font-size:.8rem"><span style="flex:1">${l}</span><input type="number" step="any" min="0" data-g="${k}" value="${G[k]}" style="width:6rem;font:inherit;padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)">${u}</label>`;
+ $('prGov').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px"><label style="margin:0;display:flex;align-items:center;gap:6px;font-size:.8rem"><span style="flex:1">Pay periods per month</span><select id="prPpm" style="font:inherit;padding:6px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)"><option value="1"${PAY.ppm==1?' selected':''}>1 – monthly</option><option value="2"${PAY.ppm==2?' selected':''}>2 – semi-monthly</option><option value="4"${PAY.ppm==4?' selected':''}>4 – weekly</option></select></label><label style="margin:0;display:flex;align-items:center;gap:6px;font-size:.8rem"><input type="checkbox" id="pr13"${PAY.th?' checked':''}> Include 13th month pay in this payroll</label>${gi('sssRate','SSS employee share','%')}${gi('sssMin','SSS min. salary credit','₱')}${gi('sssMax','SSS max. salary credit','₱')}${gi('phRate','PhilHealth employee share','%')}${gi('phMin','PhilHealth salary floor','₱')}${gi('phMax','PhilHealth salary ceiling','₱')}${gi('piRate','Pag-IBIG employee share','%')}${gi('piCap','Pag-IBIG max. fund salary','₱')}</div>`;
+ $('payBody').innerHTML=PAY.emps.length?`<table class="pt" style="min-width:2800px"><thead><tr><th>Employee No.</th><th>Employee Status</th><th>Employee</th><th>Position</th><th>Daily rate</th><th>Days</th><th>Food allowance / day</th>${PT.map(t=>`<th title="${t[1]} – ${t[2]}">${PH[t[0]]} hrs<br><small>${t[0]==='nd'?'+':'×'}${PAY.rates[t[0]]}</small></th>`).join('')}<th>Bonus</th><th title="Total basic salary earned in the year">Year basic salary<br><small>for 13th month</small></th><th>13th month pay</th><th>Food allowance total</th><th>Gov't deductions</th><th>SSS</th><th>PhilHealth</th><th>Pag-IBIG</th><th>Withholding tax</th><th>Other deduction</th><th>Gross</th><th>Net pay</th><th></th></tr></thead><tbody>${PAY.emps.map((e,i)=>`<tr><td class="nw"><input class="aw" data-i="${i}" data-f="no" value="${esc(e.no||'')}"></td><td class="nw"><select class="aw" data-i="${i}" data-st="1" style="width:auto;min-width:8rem;font:inherit;padding:7px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)">${ST.map(o=>`<option${(e.st||'Permanent')===o?' selected':''}>${o}</option>`).join('')}</select></td><td class="nw"><input class="aw" data-i="${i}" data-f="n" value="${esc(e.n)}"></td><td class="nw"><input class="aw" data-i="${i}" data-f="p" value="${esc(e.p)}"></td>${['r','d','fa'].map(f=>`<td><input type="number" min="0" step="any" data-i="${i}" data-f="${f}" value="${e[f]||0}"></td>`).join('')}${PT.map(t=>`<td><input type="number" min="0" step="any" data-i="${i}" data-h="${t[0]}" value="${(e.h&&e.h[t[0]])||0}"></td>`).join('')}<td><input type="number" min="0" step="any" data-i="${i}" data-f="bn" value="${e.bn||0}"></td><td><input type="number" min="0" step="any" data-i="${i}" data-f="yb" value="${e.yb||0}"></td><td id="p13${i}"></td><td id="pf${i}"></td><td style="text-align:center"><input type="checkbox" data-i="${i}" data-gv="1"${e.gv!==false?' checked':''}></td><td id="ps${i}"></td><td id="pp${i}"></td><td id="pi${i}"></td><td id="pt${i}"></td><td><input type="number" min="0" step="any" data-i="${i}" data-f="de" value="${e.de||0}"></td><td id="pg${i}"></td><td id="pn${i}" style="font-weight:700"></td><td><button class="x" data-pdel="${i}" aria-label="Remove">✕</button></td></tr>`).join('')}</tbody></table>`:'<p style="color:var(--mut)">No employees yet. Click “Add employee”.</p>';autoW();payTot()}
+function autoW(){document.querySelectorAll('#payBody input.aw').forEach(el=>{el.style.width=Math.max(6,(el.value||'').length+2)+'ch'})}
+function payTot(){let G=0,N=0,D=0;PAY.emps.forEach((e,i)=>{const d=det(e);G+=d.gross;N+=d.net;D+=d.td;const set=(id,v)=>{const el=$(id+i);if(el)el.textContent=peso(v)};set('pg',d.gross);set('pn',d.net);set('pf',d.fa);set('p13',d.th);set('ps',d.sss);set('pp',d.ph);set('pi',d.pi);set('pt',d.tax)});
+ $('payTot').innerHTML=[['Employees',PAY.emps.length],['Total gross',peso(G)],['Total deductions',peso(D)],['Total net pay',peso(N)]].map(([l,v])=>`<div class="card k b"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}
+$('payBody').addEventListener('input',e=>{const t=e.target,f=t.dataset.f,h=t.dataset.h;if(h){const em=PAY.emps[t.dataset.i];(em.h=em.h||{})[h]=Math.max(0,+t.value||0)}else if(f){PAY.emps[t.dataset.i][f]=(f==='n'||f==='p'||f==='no')?t.value:Math.max(0,+t.value||0);if(t.classList.contains('aw'))t.style.width=Math.max(6,t.value.length+2)+'ch'}else return;paySave();payTot()});
+$('prRates').addEventListener('input',e=>{const r=e.target.dataset.rate;if(!r)return;PAY.rates[r]=Math.max(0,+e.target.value||0);paySave();payTot();const th=$('payBody').querySelectorAll('th small');payRenderHead()});
+$('payBody').addEventListener('change',e=>{const t=e.target;if(t.dataset.gv){PAY.emps[t.dataset.i].gv=t.checked;paySave();payTot()}if(t.dataset.st){PAY.emps[t.dataset.i].st=t.value;paySave()}});
+$('prGov').addEventListener('input',e=>{const k=e.target.dataset.g;if(!k)return;PAY.g[k]=Math.max(0,+e.target.value||0);paySave();payTot()});
+$('prGov').addEventListener('change',e=>{if(e.target.id==='prPpm'){PAY.ppm=+e.target.value||1;paySave();payTot()}if(e.target.id==='pr13'){PAY.th=e.target.checked;paySave();payTot()}});
 $('payBody').addEventListener('click',e=>{const d=e.target.closest('[data-pdel]');if(d){PAY.emps.splice(+d.dataset.pdel,1);paySave();payRender()}});
-$('prAdd').onclick=()=>{PAY.emps.push({n:'New employee',p:'',r:0,d:0,ot:0,al:0,de:0});paySave();payRender()};
+$('prAdd').onclick=()=>{PAY.emps.push({no:nextNo(),st:'Permanent',n:'New employee',p:'',r:0,d:0,fa:0,h:{},bn:0,yb:0,gv:true,de:0});paySave();payRender()};
 $('prPeriod').oninput=()=>{PAY.period=$('prPeriod').value;paySave()};
-$('prOt').oninput=()=>{PAY.ot=Math.max(0,+$('prOt').value||1.25);paySave();payTot()};
-$('prCsv').onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"';const rows=[['Pay period',PAY.period],['Employee','Position','Daily rate','Days','OT hours','Allowance','Deductions','Gross','Net pay']];
- PAY.emps.forEach(e=>{const [g,n]=calcP(e);rows.push([e.n,e.p,e.r,e.d,e.ot,e.al,e.de,g.toFixed(2),n.toFixed(2)])});saveFile('payroll.csv','\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv')};
+function payRenderHead(){const ths=$('payBody').querySelectorAll('thead th small');PT.forEach((t,k)=>{if(ths[k])ths[k].textContent=(t[0]==='nd'?'+':'×')+PAY.rates[t[0]]})}
+$('prCsv').onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"';const rows=[['Pay period',PAY.period],['Employee No.','Employee Status','Employee','Position','Daily rate','Days','Food allowance/day','Food allowance total',...PT.map(t=>PH[t[0]]+' hrs (x'+PAY.rates[t[0]]+')'),'Bonus','Year basic salary','13th month pay','SSS','PhilHealth','Pag-IBIG','Withholding tax','Other deduction','Gross','Net pay']];
+ PAY.emps.forEach(e=>{const d=det(e);rows.push([e.no||'',e.st||'Permanent',e.n,e.p,e.r,e.d,e.fa||0,d.fa,...PT.map(t=>(e.h&&e.h[t[0]])||0),d.bn,e.yb||0,d.th.toFixed(2),d.sss.toFixed(2),d.ph.toFixed(2),d.pi.toFixed(2),d.tax.toFixed(2),e.de||0,d.gross.toFixed(2),d.net.toFixed(2)])});saveFile('payroll.csv','\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv')};
 
 // ===== Material list (admin only, stored in this browser only) =====
 const INV=[3,5,6,8,10,12,15,16,20,25,30,50,100];
