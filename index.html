@@ -51,7 +51,7 @@ svg text{fill:var(--mut);font-size:11px}
 #menu a:hover{background:var(--bg)}#menu a.on{background:var(--blue);color:#fff}
 #burger{display:none;font-size:1.375rem;line-height:1;padding:6px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg);cursor:pointer}
 @media(max-width:700px){#burger{display:block}#menu{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--card);border-bottom:1px solid var(--bd);padding:8px 16px 12px}#menu.open{display:flex}}
-.page{display:none}.page.on{display:block}
+.page{display:none}.page.on{display:block;animation:pgin .35s ease}@keyframes pgin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){.page.on{animation:none}}
 .stat{margin:14px 0 0;display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--blue),#0f2266);color:#fff;border-radius:16px;padding:18px 22px}
 .stat .n{font-size:2.875rem;font-weight:800;color:var(--gold);line-height:1}
 .stat small{display:block;opacity:.85;font-size:0.8125rem}
@@ -355,7 +355,7 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
    <form id="cf">
     <input id="cn" placeholder="Your name" required>
     <input id="cp" placeholder="Phone or email" required>
-    <select id="cs"><option>Solar installation</option><option>Electrical Installation</option><option>Maintenance &amp; Repair</option><option>Panel Upgrade &amp; Replacement</option><option>Lighting Solutions</option><option>Generator Installation</option><option>CCTV &amp; Security Systems</option><option>Whole House Wiring</option><option>Grounding Systems</option><option>Troubleshooting &amp; Diagnostics</option><option>Job application</option></select>
+    <select id="cs"><option>Solar installation</option><option>Electrical Installation</option><option>Maintenance &amp; Repair</option><option>Panel Upgrade &amp; Replacement</option><option>Lighting Solutions</option><option>Generator Installation</option><option>CCTV &amp; Security Systems</option><option>Whole House Wiring</option><option>Air-Conditioner</option><option>Elevator</option><option>Escalator</option><option>Lightning Protection</option><option>Grounding Systems</option><option>Troubleshooting &amp; Diagnostics</option><option>Job application</option></select>
     <textarea id="cm" rows="4" placeholder="How can we help?" required></textarea>
     <button class="btn" type="submit" style="width:100%">Send message</button>
     <div id="cr" style="font-size:0.8125rem;color:var(--mut);margin-top:8px;white-space:pre-wrap"></div>
@@ -367,7 +367,9 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
 <div id="careers" class="page pg">
  <div class="card">
   <h1>Careers</h1>
-  <p>Join a team that powers homes, buildings and a cleaner future.</p>
+  <p id="carIntro">Join a team that powers homes, buildings and a cleaner future.</p>
+  <div class="addbar" id="carAdm" hidden><input id="carIn" aria-label="Careers intro text" placeholder="Intro text shown under the Careers heading" style="flex:1 1 260px;font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)"><button class="btn" id="carAdd">＋ Add role</button><button class="btn o" id="carReset">Reset careers</button><span id="carSaved" style="font-size:.8rem;color:var(--mut);align-self:center"></span></div>
+  <p class="pnote" id="carNote" hidden>Admin: edit the intro, job titles and details directly. Changes save in this browser and are included when you use “Save site” to publish.</p>
   <div id="roles"></div>
  </div>
 </div>
@@ -547,14 +549,14 @@ $('cartBody').onclick=e=>{const q=e.target.closest('[data-q]'),r=e.target.closes
  else if(r){delete cart[r.dataset.rm];saveCart()}
  else if(e.target.id==='cc'){cart={};saveCart()}
  else if(e.target.id==='rq'){const ids=Object.keys(cart);go('contact');$('cs').value='Solar installation';$('cm').value='Quote request:\n'+ids.map(k=>'- '+PK[k][0]+' ('+PK[k][1]+' kW) × '+cart[k]).join('\n')+'\nTotal: '+peso(ids.reduce((s,k)=>s+price(k)*cart[k],0))}};
-const SV=[['Electrical Installation','🔌'],['Maintenance & Repair','🔧'],['Panel Upgrade & Replacement','🎛️'],['Lighting Solutions','💡'],['Generator Installation','⚙️'],['CCTV & Security Systems','📹'],['Whole House Wiring','🏠'],['Grounding Systems','🌍'],['Troubleshooting & Diagnostics','🔍']];
+const SV=[['Electrical Installation','🔌'],['Maintenance & Repair','🔧'],['Panel Upgrade & Replacement','🎛️'],['Lighting Solutions','💡'],['Generator Installation','⚙️'],['CCTV & Security Systems','📹'],['Whole House Wiring','🏠'],['Air-Conditioner','❄️'],['Elevator','🛗'],['Escalator','↗️'],['Lightning Protection','⚡'],['Grounding Systems','🌍'],['Troubleshooting & Diagnostics','🔍']];
 $('sv').innerHTML=SV.map((s,i)=>`<div class="sc"><div class="ic">${s[1]}</div><b>${s[0].replace(/&/g,'&amp;')}</b><button class="btn" data-sv="${i}">Request service</button></div>`).join('');
 $('sv').onclick=e=>{const b=e.target.closest('[data-sv]');if(!b)return;const s=SV[b.dataset.sv];go('contact');$('cs').value=s[2]||s[0];$('cm').value='I would like to inquire about: '+s[0]+'.'};
 
 // ===== Admin, picture upload, payroll =====
 const BAKED={};/*B*/
 let PKIMG=Object.assign({},BAKED);try{const l=localStorage.getItem('nhj_pk');if(l)PKIMG=JSON.parse(l)}catch(e){}
-const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/
+const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/const BAKEDR=null;/*R*/
 (function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==5&&(l.cpk===62000||l.cpk===55000))delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
 $('cpk').addEventListener('input',()=>saveCfg());$('pw').addEventListener('input',()=>saveCfg());$('sun').addEventListener('input',()=>{if(isAdmin)saveCfg()});
 function flashSaved(){const el=$('saveStat');if(!el)return;const d=new Date();el.textContent='✓ Saved '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}
@@ -565,7 +567,7 @@ function saveFile(name,text,type){const a=document.createElement('a');a.href=URL
 async function sha(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('nhj|'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'nhj|'+s)h=(h*33)^c.charCodeAt(0);return 'x'+(h>>>0).toString(16)}}
 const getH=()=>{try{return localStorage.getItem('nhj_ah')||''}catch(e){return ''}};
 const setH=v=>{try{localStorage.setItem('nhj_ah',v)}catch(e){}};
-function applyAdmin(){$('payLi').hidden=!isAdmin;$('matLi').hidden=!isAdmin;$('calcAdm').hidden=!isAdmin;$('pkAdm').hidden=!isAdmin;$('adminBar').hidden=!isAdmin;$('adminLink').textContent=isAdmin?'Admin: log out':'Admin';pkgs();if(!isAdmin&&($('payroll').classList.contains('on')||$('materials').classList.contains('on')))go('home')}
+function applyAdmin(){try{carRender()}catch(_){}$('payLi').hidden=!isAdmin;$('matLi').hidden=!isAdmin;$('calcAdm').hidden=!isAdmin;$('pkAdm').hidden=!isAdmin;$('adminBar').hidden=!isAdmin;$('adminLink').textContent=isAdmin?'Admin: log out':'Admin';pkgs();if(!isAdmin&&($('payroll').classList.contains('on')||$('materials').classList.contains('on')))go('home')}
 function logout(){isAdmin=false;try{sessionStorage.removeItem('nhj_a')}catch(e){}applyAdmin();toast('Logged out')}
 function openM(mode){mMode=mode;$('mErr').textContent='';['mCur','mNew','mCf'].forEach(i=>$(i).value='');$('mCur').hidden=mode==='setup';$('mNew').hidden=mode==='login';$('mCf').hidden=mode==='login';$('mT').textContent={setup:'Create admin password',login:'Admin login',change:'Change admin password'}[mode];$('mdl').hidden=false;setTimeout(()=>(mode==='setup'?$('mNew'):$('mCur')).focus(),50)}
 $('adminLink').onclick=()=>isAdmin?logout():openM(getH()?'login':'setup');
@@ -582,8 +584,8 @@ $('saveSite').onclick=()=>{const c=document.documentElement.cloneNode(true);
  ['pk','sv','apps','roles','cartBody','dk','cBars','cLine','payBody','payTot','matBody','matKpi','matSum','matSel','cr'].forEach(id=>{const el=c.querySelector('#'+id);if(el)el.innerHTML=''});
  c.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='home'));
  c.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p==='home'));
- c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
- const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:5})+';/*C*/');
+ c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#carAdm').hidden=true;c.querySelector('#carNote').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
+ const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:5})+';/*C*/').replace(/const BAKEDR=[\s\S]*?;\/\*R\*\//,()=>'const BAKEDR='+JSON.stringify({intro:$('carIntro').textContent,roles:ROLES})+';/*R*/');
  saveFile('index.html','<!DOCTYPE html>\n'+c.outerHTML,'text/html')};
 
 const PT=[['ot','Regular OT','Ordinary day, beyond 8 hrs',1.25],['rd','Rest day / special day','First 8 hrs worked',1.30],['rdot','Rest day / special day OT','Beyond 8 hrs',1.69],['srd','Special day on rest day','First 8 hrs worked',1.50],['srdot','Special day on rest day OT','Beyond 8 hrs',1.95],['rh','Regular holiday','First 8 hrs worked',2.00],['rhot','Regular holiday OT','Beyond 8 hrs',2.60],['rhrd','Regular holiday on rest day','First 8 hrs worked',2.60],['rhrdot','Regular holiday on rest day OT','Beyond 8 hrs',3.38],['dh','Double holiday','First 8 hrs worked',3.00],['dhot','Double holiday OT','Beyond 8 hrs',3.90],['nd','Night differential (10 pm–6 am)','Add-on to hourly rate',0.10]];
@@ -656,9 +658,26 @@ $('matReset').onclick=()=>{MAT=Object.assign({},MDEF);XTRA=[];matSave();matRende
 $('matCsv').onclick=()=>{const i=+$('matSel').value||0,b=bom(i),q=v=>'"'+String(v).replace(/"/g,'""')+'"',rows=[['Package',PK[i][0],PK[i][1]+' kW'],['Material','Qty','Unit','Unit price','Total']];b.rows.forEach(r=>rows.push([r.name,r.q,r.u,r.p,r.q*r.p]));rows.push(['Subtotal (excl. VAT)','','','',b.sub],['VAT '+VAT+'%','','','',b.vat],['TOTAL incl. VAT','','','',b.tot]);saveFile('materials-'+PK[i][0]+'.csv','\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv')};
 const CV=[['Christ-Centered Leadership','We lead with faith, purpose, and God at the center.'],['Integrity and Accountability','We act with honesty, transparency, and responsibility.'],['Service with Compassion','We serve with care, respect, and dedication.'],['Stewardship and Excellence','We manage resources wisely and deliver quality work.'],['Empowerment and Brotherhood','We build trust, teamwork, and support one another.'],['Social Responsibility','We uplift communities through sustainable solutions.'],['Faith in Action','We live our values through ethical and meaningful work.'],['Work-Life Balance and Family Values','We honor family and promote balanced living.']];
 $('cv').innerHTML=CV.map((v,i)=>`<div class="cvi"><i>${i+1}</i><b>${v[0]}</b><span>${v[1]}</span></div>`).join('');
-const ROLES=[['Licensed Electrician','Full-time · Residential & commercial'],['Solar Installer','Full-time · Rooftop PV systems'],['Site Supervisor','Full-time · Project delivery'],['Estimator / Sales Engineer','Full-time · Quotes & client support']];
-$('roles').innerHTML=ROLES.map((r,i)=>`<div class="card role"><div><b>${r[0]}</b><small>${r[1]}</small></div><button class="btn" data-apply="${i}">Apply</button></div>`).join('');
-$('roles').onclick=e=>{const b=e.target.closest('[data-apply]');if(!b)return;go('contact');$('cs').value='Job application';$('cm').value='I would like to apply for: '+ROLES[b.dataset.apply][0]+'.'};
+const DEFINTRO=$('carIntro').textContent,DEFROLES=[['Licensed Electrician','Full-time · Residential & commercial'],['Solar Installer','Full-time · Rooftop PV systems'],['Site Supervisor','Full-time · Project delivery'],['Estimator / Sales Engineer','Full-time · Quotes & client support']];
+let ROLES=JSON.parse(JSON.stringify(DEFROLES));
+(function(){let c=BAKEDR;try{const l=JSON.parse(localStorage.getItem('nhj_car')||'null');if(l)c=l}catch(e){}if(c){if(Array.isArray(c.roles))ROLES=c.roles.map(r=>[String(r[0]||''),String(r[1]||'')]);if(typeof c.intro==='string')$('carIntro').textContent=c.intro}})();
+const escH=t=>String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function carSave(){try{localStorage.setItem('nhj_car',JSON.stringify({intro:$('carIntro').textContent,roles:ROLES}));const d=new Date();$('carSaved').textContent='✓ Saved '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){toast('Browser storage unavailable – changes not saved')}}
+function carRender(){
+ $('carAdm').hidden=!isAdmin;$('carNote').hidden=!isAdmin;
+ if(isAdmin&&document.activeElement!==$('carIn'))$('carIn').value=$('carIntro').textContent;
+ const st='font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg);width:100%';
+ $('roles').innerHTML=ROLES.length?ROLES.map((r,i)=>isAdmin
+  ?`<div class="card role"><div style="flex:1 1 240px;display:grid;gap:6px"><input style="${st}" data-rt="${i}" value="${escH(r[0])}" aria-label="Job title" placeholder="Job title"><input style="${st}" data-rd="${i}" value="${escH(r[1])}" aria-label="Job details" placeholder="Type · details"></div><button class="btn o" data-rdel="${i}">🗑 Delete</button></div>`
+  :`<div class="card role"><div><b>${escH(r[0])}</b><small>${escH(r[1])}</small></div><button class="btn" data-apply="${i}">Apply</button></div>`).join('')
+  :'<p>No open roles right now – check back soon, or send us a message through the Contact page.</p>';
+}
+$('carIn').addEventListener('input',()=>{$('carIntro').textContent=$('carIn').value;carSave()});
+$('carAdd').onclick=()=>{ROLES.push(['New role','Full-time · Details']);carSave();carRender();toast('Role added')};
+$('carReset').onclick=()=>{const b=$('carReset');if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='⚠ Tap again to reset';setTimeout(()=>{b.dataset.sure='';b.textContent='Reset careers'},3500);return}b.dataset.sure='';b.textContent='Reset careers';ROLES=JSON.parse(JSON.stringify(DEFROLES));$('carIntro').textContent=DEFINTRO;try{localStorage.removeItem('nhj_car')}catch(e){}carRender();$('carSaved').textContent='';toast('Careers reset')};
+$('roles').addEventListener('input',e=>{const t=e.target;if(t.dataset.rt!==undefined){ROLES[+t.dataset.rt][0]=t.value;carSave()}else if(t.dataset.rd!==undefined){ROLES[+t.dataset.rd][1]=t.value;carSave()}});
+$('roles').onclick=e=>{const d=e.target.closest('[data-rdel]');if(d){const i=+d.dataset.rdel;if(d.dataset.sure!=='1'){d.dataset.sure='1';d.textContent='⚠ Tap again to delete';d.style.borderColor='#e5484d';d.style.color='#e5484d';setTimeout(()=>{if(d.isConnected){d.dataset.sure='';d.textContent='🗑 Delete';d.style.borderColor='';d.style.color=''}},3500);return}ROLES.splice(i,1);carSave();carRender();toast('Role deleted');return}const b=e.target.closest('[data-apply]');if(!b)return;go('contact');$('cs').value='Job application';$('cm').value='I would like to apply for: '+ROLES[b.dataset.apply][0]+'.'};
+carRender();
 $('cf').onsubmit=e=>{e.preventDefault();const n=$('cn').value.trim(),c=$('cp').value.trim(),sj=$('cs').value,m=$('cm').value.trim(),r=$('cr');r.textContent='';
 const miss=[];if(!n)miss.push('your name');if(!c)miss.push('your phone or email');if(!sj)miss.push('a subject');if(!m)miss.push('your message');
 if(miss.length){r.style.color='#e5484d';r.textContent='Please complete the details before sending: '+miss.join(', ')+'.';return}
@@ -668,7 +687,7 @@ r.style.color='var(--mut)';r.appendChild(document.createTextNode('Details comple
 const a=document.createElement('a');a.href=url;a.target='_top';a.textContent='tap here to send';r.appendChild(a);r.appendChild(document.createTextNode('.'));
 try{a.click()}catch(_){}};
 let cntT;function count(){clearInterval(cntT);let v=0;cntT=setInterval(()=>{v+=2;if(v>=67){v=67;clearInterval(cntT)}$('cnt').textContent=v},25)}
-function go(p){if((p==='payroll'||p==='materials')&&!isAdmin)p='home';document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id===p));document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));$('menu').classList.remove('open');$('burger').setAttribute('aria-expanded','false');scrollTo({top:0});if(p==='home')count();if(p==='payroll')payRender();if(p==='materials')matRender()}
+function go(p){if((p==='payroll'||p==='materials')&&!isAdmin)p='home';document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id===p));document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));$('menu').classList.remove('open');$('burger').setAttribute('aria-expanded','false');scrollTo({top:0});try{calc();pkgs();cartUI();carRender();const _r=$('cr');if(_r)_r.textContent=''}catch(_){}if(p==='home')count();if(p==='payroll')payRender();if(p==='materials')matRender()}
 document.querySelector('.top').addEventListener('click',e=>{const a=e.target.closest('[data-p]');if(a)go(a.dataset.p)});
 $('burger').onclick=()=>{const o=$('menu').classList.toggle('open');$('burger').setAttribute('aria-expanded',o)};
 count();calc();rows();cartUI();applyAdmin();
