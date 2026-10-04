@@ -254,7 +254,7 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
     <small style="color:var(--mut)">🔒 Admin only</small>
     <label>Solar panel wattage (W) – pick or type your own</label><input type="number" id="pw" value="630" min="100" max="1000" step="5" list="pws">
     <datalist id="pws"><option value="400"><option value="450"><option value="500"><option value="550"><option value="580"><option value="600"><option value="620"><option value="650"><option value="700"></datalist>
-    <label>Installed cost per kW (₱)</label><input type="number" id="cpk" value="60000" step="1000" min="0">
+    <label>Installed cost per kW (₱)</label><input type="number" id="cpk" value="55000" step="1000" min="0">
     
    </div>
    <label>Bill to offset with solar: <b id="vOff"></b></label><input type="range" id="off" min="30" max="100" value="80">
@@ -356,8 +356,8 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
     <input id="cn" placeholder="Your name" required>
     <input id="cp" placeholder="Phone or email" required>
     <select id="cs"><option>Solar installation</option><option>Electrical Installation</option><option>Maintenance &amp; Repair</option><option>Panel Upgrade &amp; Replacement</option><option>Lighting Solutions</option><option>Generator Installation</option><option>CCTV &amp; Security Systems</option><option>Whole House Wiring</option><option>Grounding Systems</option><option>Troubleshooting &amp; Diagnostics</option><option>Job application</option></select>
-    <textarea id="cm" rows="4" placeholder="How can we help?"></textarea>
-    <button class="btn" type="submit" style="width:100%">Prepare message</button>
+    <textarea id="cm" rows="4" placeholder="How can we help?" required></textarea>
+    <button class="btn" type="submit" style="width:100%">Send message</button>
     <div id="cr" style="font-size:0.8125rem;color:var(--mut);margin-top:8px;white-space:pre-wrap"></div>
    </form>
   </div>
@@ -529,7 +529,7 @@ $('pk').onclick=e=>{const T=s=>e.target.closest(s);let x;
  if(x=T('[data-add]')){addCart(+x.dataset.add);return}
  if(x=T('[data-pk]')){const p=PK[x.dataset.pk];go('contact');$('cs').value='Solar installation';$('cm').value='I am interested in the '+p[0]+' package ('+p[1]+' kW).'}};
 $('pkAdd').onclick=()=>{PK.push(['New package',5,['','Smart inverter + monitoring','Wiring &amp; mounting','Permit assistance'],'Custom',0]);saveCfg();pkgs();const k=$('pk').lastElementChild;if(k){k.scrollIntoView({block:'nearest'});k.querySelector('input').select()}};
-$('pkReset').onclick=()=>{PK.length=0;DEFPK.forEach(p=>PK.push(JSON.parse(JSON.stringify(p))));POP=0;PKIMG={};cart={};$('cpk').value=60000;$('pw').value=630;$('sun').value=3;calc();saveCfg();savePK();saveCart();pkgs();toast('Packages reset to defaults')};
+$('pkReset').onclick=()=>{PK.length=0;DEFPK.forEach(p=>PK.push(JSON.parse(JSON.stringify(p))));POP=0;PKIMG={};cart={};$('cpk').value=55000;$('pw').value=630;$('sun').value=3;calc();saveCfg();savePK();saveCart();pkgs();toast('Packages reset to defaults')};
 
 // Cart
 let cart={};try{cart=JSON.parse(localStorage.getItem('nhjc2')||'{}')}catch(e){}
@@ -555,10 +555,10 @@ $('sv').onclick=e=>{const b=e.target.closest('[data-sv]');if(!b)return;const s=S
 const BAKED={};/*B*/
 let PKIMG=Object.assign({},BAKED);try{const l=localStorage.getItem('nhj_pk');if(l)PKIMG=JSON.parse(l)}catch(e){}
 const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/
-(function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==3&&l.cpk===62000)delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
+(function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==4&&(l.cpk===62000||l.cpk===60000))delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
 $('cpk').addEventListener('input',()=>saveCfg());$('pw').addEventListener('input',()=>saveCfg());$('sun').addEventListener('input',()=>{if(isAdmin)saveCfg()});
 function flashSaved(){const el=$('saveStat');if(!el)return;const d=new Date();el.textContent='✓ Saved '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-function saveCfg(){try{localStorage.setItem('nhj_pkc',JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:3}));flashSaved()}catch(e){toast('Browser storage unavailable – changes not saved')}}
+function saveCfg(){try{localStorage.setItem('nhj_pkc',JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||55000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:4}));flashSaved()}catch(e){toast('Browser storage unavailable – changes not saved')}}
 let upIdx=0,isAdmin=false,mMode='';try{isAdmin=sessionStorage.getItem('nhj_a')==='1'}catch(e){}
 function savePK(){try{localStorage.setItem('nhj_pk',JSON.stringify(PKIMG));flashSaved()}catch(e){toast('Browser storage is full – picture kept for this visit only')}}
 function saveFile(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('If nothing downloads, open the hosted page directly – previews can block downloads')}
@@ -583,7 +583,7 @@ $('saveSite').onclick=()=>{const c=document.documentElement.cloneNode(true);
  c.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='home'));
  c.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p==='home'));
  c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
- const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:3})+';/*C*/');
+ const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||55000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:4})+';/*C*/');
  saveFile('index.html','<!DOCTYPE html>\n'+c.outerHTML,'text/html')};
 
 const PT=[['ot','Regular OT','Ordinary day, beyond 8 hrs',1.25],['rd','Rest day / special day','First 8 hrs worked',1.30],['rdot','Rest day / special day OT','Beyond 8 hrs',1.69],['srd','Special day on rest day','First 8 hrs worked',1.50],['srdot','Special day on rest day OT','Beyond 8 hrs',1.95],['rh','Regular holiday','First 8 hrs worked',2.00],['rhot','Regular holiday OT','Beyond 8 hrs',2.60],['rhrd','Regular holiday on rest day','First 8 hrs worked',2.60],['rhrdot','Regular holiday on rest day OT','Beyond 8 hrs',3.38],['dh','Double holiday','First 8 hrs worked',3.00],['dhot','Double holiday OT','Beyond 8 hrs',3.90],['nd','Night differential (10 pm–6 am)','Add-on to hourly rate',0.10]];
@@ -659,8 +659,15 @@ $('cv').innerHTML=CV.map((v,i)=>`<div class="cvi"><i>${i+1}</i><b>${v[0]}</b><sp
 const ROLES=[['Licensed Electrician','Full-time · Residential & commercial'],['Solar Installer','Full-time · Rooftop PV systems'],['Site Supervisor','Full-time · Project delivery'],['Estimator / Sales Engineer','Full-time · Quotes & client support']];
 $('roles').innerHTML=ROLES.map((r,i)=>`<div class="card role"><div><b>${r[0]}</b><small>${r[1]}</small></div><button class="btn" data-apply="${i}">Apply</button></div>`).join('');
 $('roles').onclick=e=>{const b=e.target.closest('[data-apply]');if(!b)return;go('contact');$('cs').value='Job application';$('cm').value='I would like to apply for: '+ROLES[b.dataset.apply][0]+'.'};
-$('cf').onsubmit=e=>{e.preventDefault();$('cr').textContent='Message ready ✓\nName: '+$('cn').value+'\nContact: '+$('cp').value+'\nRe: '+$('cs').value+'\n'+$('cm').value+'\n\n(Demo form – connect an email address to send.)'};
-let cntT;function count(){clearInterval(cntT);let v=0;cntT=setInterval(()=>{v+=6;if(v>=300){v=300;clearInterval(cntT)}$('cnt').textContent=v},25)}
+$('cf').onsubmit=e=>{e.preventDefault();const n=$('cn').value.trim(),c=$('cp').value.trim(),sj=$('cs').value,m=$('cm').value.trim(),r=$('cr');r.textContent='';
+const miss=[];if(!n)miss.push('your name');if(!c)miss.push('your phone or email');if(!sj)miss.push('a subject');if(!m)miss.push('your message');
+if(miss.length){r.style.color='#e5484d';r.textContent='Please complete the details before sending: '+miss.join(', ')+'.';return}
+const body='Name: '+n+'\nPhone/Email: '+c+'\nRe: '+sj+'\n\n'+m;
+const url='mailto:nhjelectricalservices@gmail.com?subject='+encodeURIComponent('Website inquiry: '+sj)+'&body='+encodeURIComponent(body);
+r.style.color='var(--mut)';r.appendChild(document.createTextNode('Details complete ✓ Opening your email app to send to nhjelectricalservices@gmail.com. If it did not open, '));
+const a=document.createElement('a');a.href=url;a.target='_top';a.textContent='tap here to send';r.appendChild(a);r.appendChild(document.createTextNode('.'));
+try{a.click()}catch(_){}};
+let cntT;function count(){clearInterval(cntT);let v=0;cntT=setInterval(()=>{v+=2;if(v>=67){v=67;clearInterval(cntT)}$('cnt').textContent=v},25)}
 function go(p){if((p==='payroll'||p==='materials')&&!isAdmin)p='home';document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id===p));document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));$('menu').classList.remove('open');$('burger').setAttribute('aria-expanded','false');scrollTo({top:0});if(p==='home')count();if(p==='payroll')payRender();if(p==='materials')matRender()}
 document.querySelector('.top').addEventListener('click',e=>{const a=e.target.closest('[data-p]');if(a)go(a.dataset.p)});
 $('burger').onclick=()=>{const o=$('menu').classList.toggle('open');$('burger').setAttribute('aria-expanded',o)};
