@@ -254,7 +254,7 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
     <small style="color:var(--mut)">🔒 Admin only</small>
     <label>Solar panel wattage (W) – pick or type your own</label><input type="number" id="pw" value="630" min="100" max="1000" step="5" list="pws">
     <datalist id="pws"><option value="400"><option value="450"><option value="500"><option value="550"><option value="580"><option value="600"><option value="620"><option value="650"><option value="700"></datalist>
-    <label>Installed cost per kW (₱)</label><input type="number" id="cpk" value="55000" step="1000" min="0">
+    <label>Installed cost per kW (₱)</label><input type="number" id="cpk" value="60000" step="1000" min="0">
     
    </div>
    <label>Bill to offset with solar: <b id="vOff"></b></label><input type="range" id="off" min="30" max="100" value="80">
@@ -529,7 +529,7 @@ $('pk').onclick=e=>{const T=s=>e.target.closest(s);let x;
  if(x=T('[data-add]')){addCart(+x.dataset.add);return}
  if(x=T('[data-pk]')){const p=PK[x.dataset.pk];go('contact');$('cs').value='Solar installation';$('cm').value='I am interested in the '+p[0]+' package ('+p[1]+' kW).'}};
 $('pkAdd').onclick=()=>{PK.push(['New package',5,['','Smart inverter + monitoring','Wiring &amp; mounting','Permit assistance'],'Custom',0]);saveCfg();pkgs();const k=$('pk').lastElementChild;if(k){k.scrollIntoView({block:'nearest'});k.querySelector('input').select()}};
-$('pkReset').onclick=()=>{PK.length=0;DEFPK.forEach(p=>PK.push(JSON.parse(JSON.stringify(p))));POP=0;PKIMG={};cart={};$('cpk').value=55000;$('pw').value=630;$('sun').value=3;calc();saveCfg();savePK();saveCart();pkgs();toast('Packages reset to defaults')};
+$('pkReset').onclick=()=>{PK.length=0;DEFPK.forEach(p=>PK.push(JSON.parse(JSON.stringify(p))));POP=0;PKIMG={};cart={};$('cpk').value=60000;$('pw').value=630;$('sun').value=3;calc();saveCfg();savePK();saveCart();pkgs();toast('Packages reset to defaults')};
 
 // Cart
 let cart={};try{cart=JSON.parse(localStorage.getItem('nhjc2')||'{}')}catch(e){}
@@ -555,10 +555,10 @@ $('sv').onclick=e=>{const b=e.target.closest('[data-sv]');if(!b)return;const s=S
 const BAKED={};/*B*/
 let PKIMG=Object.assign({},BAKED);try{const l=localStorage.getItem('nhj_pk');if(l)PKIMG=JSON.parse(l)}catch(e){}
 const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/
-(function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==4&&(l.cpk===62000||l.cpk===60000))delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
+(function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==5&&(l.cpk===62000||l.cpk===55000))delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
 $('cpk').addEventListener('input',()=>saveCfg());$('pw').addEventListener('input',()=>saveCfg());$('sun').addEventListener('input',()=>{if(isAdmin)saveCfg()});
 function flashSaved(){const el=$('saveStat');if(!el)return;const d=new Date();el.textContent='✓ Saved '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-function saveCfg(){try{localStorage.setItem('nhj_pkc',JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||55000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:4}));flashSaved()}catch(e){toast('Browser storage unavailable – changes not saved')}}
+function saveCfg(){try{localStorage.setItem('nhj_pkc',JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:5}));flashSaved()}catch(e){toast('Browser storage unavailable – changes not saved')}}
 let upIdx=0,isAdmin=false,mMode='';try{isAdmin=sessionStorage.getItem('nhj_a')==='1'}catch(e){}
 function savePK(){try{localStorage.setItem('nhj_pk',JSON.stringify(PKIMG));flashSaved()}catch(e){toast('Browser storage is full – picture kept for this visit only')}}
 function saveFile(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('If nothing downloads, open the hosted page directly – previews can block downloads')}
@@ -583,7 +583,7 @@ $('saveSite').onclick=()=>{const c=document.documentElement.cloneNode(true);
  c.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='home'));
  c.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p==='home'));
  c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
- const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||55000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:4})+';/*C*/');
+ const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:5})+';/*C*/');
  saveFile('index.html','<!DOCTYPE html>\n'+c.outerHTML,'text/html')};
 
 const PT=[['ot','Regular OT','Ordinary day, beyond 8 hrs',1.25],['rd','Rest day / special day','First 8 hrs worked',1.30],['rdot','Rest day / special day OT','Beyond 8 hrs',1.69],['srd','Special day on rest day','First 8 hrs worked',1.50],['srdot','Special day on rest day OT','Beyond 8 hrs',1.95],['rh','Regular holiday','First 8 hrs worked',2.00],['rhot','Regular holiday OT','Beyond 8 hrs',2.60],['rhrd','Regular holiday on rest day','First 8 hrs worked',2.60],['rhrdot','Regular holiday on rest day OT','Beyond 8 hrs',3.38],['dh','Double holiday','First 8 hrs worked',3.00],['dhot','Double holiday OT','Beyond 8 hrs',3.90],['nd','Night differential (10 pm–6 am)','Add-on to hourly rate',0.10]];
