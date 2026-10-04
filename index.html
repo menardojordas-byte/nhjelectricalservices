@@ -106,7 +106,7 @@ form input,form select,form textarea{width:100%;font:inherit;padding:9px 10px;bo
 @media(max-width:700px){.ar{grid-template-columns:1fr 1fr 1fr}.ar .nm{grid-column:1/-1}}
 html{background:var(--bg)}body{background:transparent}
 #bgpic{position:fixed;inset:0;z-index:-1;overflow:hidden}
-#bgpic svg{width:100%;height:100%;display:block}
+#bgpic svg{width:100%;height:100%;display:block}#bgpic.custom svg{display:none}#bgpic img{width:100%;height:100%;object-fit:cover;display:block}.prj{width:100%;border-collapse:collapse;font-size:.85rem;min-width:1080px}.prj td.pf{font-weight:700;white-space:nowrap}.prj td.pf.neg{color:#e5484d}.prj td.pf.pos{color:var(--green)}.prj th,.prj td{padding:6px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:middle}.prj th{font-size:.75rem;color:var(--mut)}.prj input,.prj select{font:inherit;padding:7px 8px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg);width:100%}.prj td:first-child{border-left:4px solid var(--bd);width:2rem;color:var(--mut)}.prj tr.s-completed td:first-child{border-left-color:var(--green)}.prj tr.s-ongoing td:first-child{border-left-color:var(--blue)}.prj tr.s-negotiation td:first-child{border-left-color:var(--gold)}.imgbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:.8rem;color:var(--mut)}.imgbar .btn{padding:6px 10px;font-size:.75rem}.adm .imgbar{display:inline-flex;margin:0;color:inherit}
 #bgpic:after{content:"";position:absolute;inset:0;background:var(--bg);opacity:.5}
 .sec-h,.sec-s,footer{text-shadow:0 0 10px var(--bg),0 0 4px var(--bg)}
 .sv{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:14px}
@@ -217,11 +217,11 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
   <li><a data-p="contact">Contact Us</a></li>
   <li><a data-p="careers">Careers</a></li>
   <li id="matLi" hidden><a data-p="materials">🧱 Materials</a></li>
-  <li id="payLi" hidden><a data-p="payroll">💼 Payroll</a></li>
+  <li id="payLi" hidden><a data-p="payroll">💼 Payroll</a></li><li id="prjLi" hidden><a data-p="projects">📋 Projects</a></li>
   <li><a data-p="cart">🛒 Cart<span id="cbadge">0</span></a></li>
  </ul>
 </div></header>
-<div class="adm" id="adminBar" hidden>🔒 <b>Admin mode</b><span id="saveStat" style="color:#9be7a8">✓ Changes save automatically</span><button id="saveSite">⬇ Download site file with my pictures</button><button id="admOut">Log out</button></div>
+<div class="adm" id="adminBar" hidden>🔒 <b>Admin mode</b><span id="saveStat" style="color:#9be7a8">✓ Changes save automatically</span><span class="imgbar"><button data-ipick="bg">🖼 Background picture</button><button data-ireset="bg" title="Use the original background">↺</button></span><button id="saveSite">⬇ Download site file with my pictures</button><button id="admOut">Log out</button></div>
 <div class="wrap">
 <div id="home" class="page on">
 <section class="hero">
@@ -388,6 +388,21 @@ footer{text-align:center;color:var(--mut);font-size:0.75rem;margin:20px 0 8px}
  </div>
 </div>
 
+<div id="projects" class="page pg">
+ <div class="card">
+  <h1>Projects <small style="font-size:.5em;color:var(--mut)">admin only</small></h1>
+  <p class="pnote">Contract prices are saved only in this browser and are never part of the public page. <b>Profit</b> = contract price − material expenses − labor cost − tax (calculated automatically). Every project marked <b>Completed</b> is added automatically to the “Completed projects” counter on the Home page. Use “Export CSV” to keep a backup.</p>
+  <div class="kpis" id="prjKpi"></div>
+  <div class="addbar">
+   <button class="btn" id="prjAdd">＋ Add project</button>
+   <select id="prjFil" aria-label="Filter by status"><option value="all">All statuses</option><option value="ongoing">On-going</option><option value="completed">Completed</option><option value="negotiation">Under negotiation</option></select>
+   <button class="btn o" id="prjCsv">Export CSV</button>
+   <label style="margin:0;display:flex;align-items:center;gap:6px;font-size:.85rem">Projects completed before this list<input id="prjBase" type="number" min="0" step="1" style="width:6rem;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)"></label>
+  </div>
+  <div id="prjBody" style="overflow:auto"></div>
+ </div>
+</div>
+
 <div id="payroll" class="page pg">
  <div class="card">
   <h1>Payroll <small style="font-size:.5em;color:var(--mut)">admin only</small></h1>
@@ -550,13 +565,13 @@ $('cartBody').onclick=e=>{const q=e.target.closest('[data-q]'),r=e.target.closes
  else if(e.target.id==='cc'){cart={};saveCart()}
  else if(e.target.id==='rq'){const ids=Object.keys(cart);go('contact');$('cs').value='Solar installation';$('cm').value='Quote request:\n'+ids.map(k=>'- '+PK[k][0]+' ('+PK[k][1]+' kW) × '+cart[k]).join('\n')+'\nTotal: '+peso(ids.reduce((s,k)=>s+price(k)*cart[k],0))}};
 const SV=[['Electrical Installation','🔌'],['Maintenance & Repair','🔧'],['Panel Upgrade & Replacement','🎛️'],['Lighting Solutions','💡'],['Generator Installation','⚙️'],['CCTV & Security Systems','📹'],['Whole House Wiring','🏠'],['Air-Conditioner','❄️'],['Elevator','🛗'],['Escalator','↗️'],['Lightning Protection','⚡'],['Grounding Systems','🌍'],['Troubleshooting & Diagnostics','🔍']];
-$('sv').innerHTML=SV.map((s,i)=>`<div class="sc"><div class="ic">${s[1]}</div><b>${s[0].replace(/&/g,'&amp;')}</b><button class="btn" data-sv="${i}">Request service</button></div>`).join('');
+function svRender(){$('sv').innerHTML=SV.map((s,i)=>{const im=IMGS['sv:'+s[0]];return `<div class="sc"><div class="ic">${im?`<img src="${im}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`:s[1]}</div><b>${escH(s[0])}</b>${isAdmin?`<div class="pu" style="justify-content:center"><button class="btn o" data-svpick="${i}">📷 Icon</button>${im?`<button class="btn o" data-svreset="${i}" title="Use the emoji icon">↺</button>`:''}</div>`:''}<button class="btn" data-sv="${i}">Request service</button></div>`}).join('')}
 $('sv').onclick=e=>{const b=e.target.closest('[data-sv]');if(!b)return;const s=SV[b.dataset.sv];go('contact');$('cs').value=s[2]||s[0];$('cm').value='I would like to inquire about: '+s[0]+'.'};
 
 // ===== Admin, picture upload, payroll =====
 const BAKED={};/*B*/
 let PKIMG=Object.assign({},BAKED);try{const l=localStorage.getItem('nhj_pk');if(l)PKIMG=JSON.parse(l)}catch(e){}
-const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/const BAKEDR=null;/*R*/
+const DEFPK=JSON.parse(JSON.stringify(PK));let POP=0;const BAKEDPK=null;/*C*/const BAKEDR=null;/*R*/const BAKEDI=null;/*I*/const BAKEDPC=null;/*P*/
 (function(){let c=BAKEDPK;try{const l=JSON.parse(localStorage.getItem('nhj_pkc')||'null');if(l){if(l.v!==2){delete l.pk;delete l.pop;PKIMG={};cart={};try{localStorage.removeItem('nhj_pk');localStorage.removeItem('nhjc2')}catch(e){}}if(l.k!==5&&(l.cpk===62000||l.cpk===55000))delete l.cpk;c=Object.assign({},BAKEDPK||{},l)}}catch(e){}if(c&&c.pk&&c.pk.length){PK.length=0;c.pk.forEach(p=>{if(p[4]===undefined&&p[0]==='Mini')p[4]=10;if(p[4]===undefined&&p[0]==='Home'&&p[1]===5)p[4]=10;PK.push(p)});POP=Math.min(c.pop||0,PK.length-1)}if(c&&c.cpk)$('cpk').value=c.cpk;if(c&&c.pw)$('pw').value=c.pw;if(c&&c.sun)$('sun').value=c.sun})();
 $('cpk').addEventListener('input',()=>saveCfg());$('pw').addEventListener('input',()=>saveCfg());$('sun').addEventListener('input',()=>{if(isAdmin)saveCfg()});
 function flashSaved(){const el=$('saveStat');if(!el)return;const d=new Date();el.textContent='✓ Saved '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}
@@ -567,7 +582,7 @@ function saveFile(name,text,type){const a=document.createElement('a');a.href=URL
 async function sha(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('nhj|'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'nhj|'+s)h=(h*33)^c.charCodeAt(0);return 'x'+(h>>>0).toString(16)}}
 const getH=()=>{try{return localStorage.getItem('nhj_ah')||''}catch(e){return ''}};
 const setH=v=>{try{localStorage.setItem('nhj_ah',v)}catch(e){}};
-function applyAdmin(){try{carRender()}catch(_){}$('payLi').hidden=!isAdmin;$('matLi').hidden=!isAdmin;$('calcAdm').hidden=!isAdmin;$('pkAdm').hidden=!isAdmin;$('adminBar').hidden=!isAdmin;$('adminLink').textContent=isAdmin?'Admin: log out':'Admin';pkgs();if(!isAdmin&&($('payroll').classList.contains('on')||$('materials').classList.contains('on')))go('home')}
+function applyAdmin(){try{carRender()}catch(_){}try{svRender();imgCtl()}catch(_){}$('payLi').hidden=!isAdmin;$('prjLi').hidden=!isAdmin;$('matLi').hidden=!isAdmin;$('calcAdm').hidden=!isAdmin;$('pkAdm').hidden=!isAdmin;$('adminBar').hidden=!isAdmin;$('adminLink').textContent=isAdmin?'Admin: log out':'Admin';pkgs();if(!isAdmin&&($('payroll').classList.contains('on')||$('materials').classList.contains('on')||$('projects').classList.contains('on')))go('home')}
 function logout(){isAdmin=false;try{sessionStorage.removeItem('nhj_a')}catch(e){}applyAdmin();toast('Logged out')}
 function openM(mode){mMode=mode;$('mErr').textContent='';['mCur','mNew','mCf'].forEach(i=>$(i).value='');$('mCur').hidden=mode==='setup';$('mNew').hidden=mode==='login';$('mCf').hidden=mode==='login';$('mT').textContent={setup:'Create admin password',login:'Admin login',change:'Change admin password'}[mode];$('mdl').hidden=false;setTimeout(()=>(mode==='setup'?$('mNew'):$('mCur')).focus(),50)}
 $('adminLink').onclick=()=>isAdmin?logout():openM(getH()?'login':'setup');
@@ -581,11 +596,11 @@ $('mdl').addEventListener('keydown',e=>{if(e.key==='Enter')$('mOk').click()});
 $('fileIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const W=640,H=Math.round(W*130/240),cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d'),s=Math.max(W/im.width,H/im.height),w=im.width*s,hh=im.height*s;g.drawImage(im,(W-w)/2,(H-hh)/2,w,hh);PKIMG[upIdx]=cv.toDataURL('image/jpeg',.82);savePK();pkgs();toast('Picture updated for '+PK[upIdx][0])};im.src=r.result};r.readAsDataURL(f)};
 
 $('saveSite').onclick=()=>{const c=document.documentElement.cloneNode(true);
- ['pk','sv','apps','roles','cartBody','dk','cBars','cLine','payBody','payTot','matBody','matKpi','matSum','matSel','cr'].forEach(id=>{const el=c.querySelector('#'+id);if(el)el.innerHTML=''});
+ ['pk','sv','apps','roles','cartBody','dk','cBars','cLine','payBody','payTot','matBody','matKpi','matSum','matSel','prjBody','prjKpi','cr'].forEach(id=>{const el=c.querySelector('#'+id);if(el)el.innerHTML=''});
  c.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='home'));
  c.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p==='home'));
- c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#carAdm').hidden=true;c.querySelector('#carNote').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
- const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:5})+';/*C*/').replace(/const BAKEDR=[\s\S]*?;\/\*R\*\//,()=>'const BAKEDR='+JSON.stringify({intro:$('carIntro').textContent,roles:ROLES})+';/*R*/');
+ c.querySelector('#payLi').hidden=true;c.querySelector('#matLi').hidden=true;c.querySelector('#calcAdm').hidden=true;c.querySelector('#cpk').setAttribute('value',$('cpk').value);c.querySelector('#pw').setAttribute('value',$('pw').value);c.querySelector('#pkAdm').hidden=true;c.querySelector('#carAdm').hidden=true;c.querySelector('#carNote').hidden=true;c.querySelectorAll('.imgbar').forEach(e=>e.remove());c.querySelector('#prjLi').hidden=true;c.querySelector('#adminBar').hidden=true;c.querySelector('#mdl').hidden=true;c.querySelector('#toast').className='';
+ const sc=c.querySelector('script');sc.textContent=sc.textContent.replace(/const BAKED=[\s\S]*?;\/\*B\*\//,()=>'const BAKED='+JSON.stringify(PKIMG)+';/*B*/').replace(/const BAKEDPK=[\s\S]*?;\/\*C\*\//,()=>'const BAKEDPK='+JSON.stringify({pk:PK,pop:POP,cpk:+$('cpk').value||60000,pw:+$('pw').value||630,sun:+$('sun').value||3,v:2,k:5})+';/*C*/').replace(/const BAKEDR=[\s\S]*?;\/\*R\*\//,()=>'const BAKEDR='+JSON.stringify({intro:$('carIntro').textContent,roles:ROLES})+';/*R*/').replace(/const BAKEDI=[\s\S]*?;\/\*I\*\//,()=>'const BAKEDI='+JSON.stringify(Object.fromEntries(Object.entries(IMGS).filter(e=>e[0].startsWith('sv:'))))+';/*I*/').replace(/const BAKEDPC=[\s\S]*?;\/\*P\*\//,()=>'const BAKEDPC='+completedTotal()+';/*P*/');
  saveFile('index.html','<!DOCTYPE html>\n'+c.outerHTML,'text/html')};
 
 const PT=[['ot','Regular OT','Ordinary day, beyond 8 hrs',1.25],['rd','Rest day / special day','First 8 hrs worked',1.30],['rdot','Rest day / special day OT','Beyond 8 hrs',1.69],['srd','Special day on rest day','First 8 hrs worked',1.50],['srdot','Special day on rest day OT','Beyond 8 hrs',1.95],['rh','Regular holiday','First 8 hrs worked',2.00],['rhot','Regular holiday OT','Beyond 8 hrs',2.60],['rhrd','Regular holiday on rest day','First 8 hrs worked',2.60],['rhrdot','Regular holiday on rest day OT','Beyond 8 hrs',3.38],['dh','Double holiday','First 8 hrs worked',3.00],['dhot','Double holiday OT','Beyond 8 hrs',3.90],['nd','Night differential (10 pm–6 am)','Add-on to hourly rate',0.10]];
@@ -686,10 +701,90 @@ const url='mailto:nhjelectricalservices@gmail.com?subject='+encodeURIComponent('
 r.style.color='var(--mut)';r.appendChild(document.createTextNode('Details complete ✓ Opening your email app to send to nhjelectricalservices@gmail.com. If it did not open, '));
 const a=document.createElement('a');a.href=url;a.target='_top';a.textContent='tap here to send';r.appendChild(a);r.appendChild(document.createTextNode('.'));
 try{a.click()}catch(_){}};
-let cntT;function count(){clearInterval(cntT);let v=0;cntT=setInterval(()=>{v+=2;if(v>=67){v=67;clearInterval(cntT)}$('cnt').textContent=v},25)}
-function go(p){if((p==='payroll'||p==='materials')&&!isAdmin)p='home';document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id===p));document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));$('menu').classList.remove('open');$('burger').setAttribute('aria-expanded','false');scrollTo({top:0});try{calc();pkgs();cartUI();carRender();const _r=$('cr');if(_r)_r.textContent=''}catch(_){}if(p==='home')count();if(p==='payroll')payRender();if(p==='materials')matRender()}
+let cntT;function count(){clearInterval(cntT);const T=completedTotal(),st=Math.max(1,Math.ceil(T/33));let v=0;cntT=setInterval(()=>{v+=st;if(v>=T){v=T;clearInterval(cntT)}$('cnt').textContent=v},25)}
+function go(p){if((p==='payroll'||p==='materials'||p==='projects')&&!isAdmin)p='home';document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id===p));document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));$('menu').classList.remove('open');$('burger').setAttribute('aria-expanded','false');scrollTo({top:0});try{calc();pkgs();cartUI();carRender();const _r=$('cr');if(_r)_r.textContent=''}catch(_){}if(p==='home')count();if(p==='payroll')payRender();if(p==='materials')matRender();if(p==='projects')prjRender()}
 document.querySelector('.top').addEventListener('click',e=>{const a=e.target.closest('[data-p]');if(a)go(a.dataset.p)});
 $('burger').onclick=()=>{const o=$('menu').classList.toggle('open');$('burger').setAttribute('aria-expanded',o)};
+
+/* ---- editable pictures ---- */
+const IMGDEF={logo:{sel:'.logo img',w:700,png:1,label:'Logo'},about:{sel:'.ab-img',w:900,label:'About photo'},banner:{sel:'.ab-ban',w:1400,label:'About banner'}};
+const DEFIMG={};
+Object.keys(IMGDEF).forEach(k=>{const el=document.querySelector(IMGDEF[k].sel);IMGDEF[k].el=el;DEFIMG[k]=el.getAttribute('src')});
+let IMGS=Object.assign({},BAKEDI||{});try{const l=JSON.parse(localStorage.getItem('nhj_img')||'null');if(l)Object.assign(IMGS,l)}catch(e){}
+function imgCfg(k){if(IMGDEF[k])return IMGDEF[k];if(k==='bg')return{w:1600,label:'Background picture'};return{w:160,png:1,label:'Service icon'}}
+function imgSave(){try{localStorage.setItem('nhj_img',JSON.stringify(IMGS));flashSaved()}catch(e){toast('Browser storage is full – picture kept for this visit only')}}
+function imgApply(k){
+ if(IMGDEF[k]){if(IMGS[k])IMGDEF[k].el.src=IMGS[k]}
+ else if(k==='bg'){const b=$('bgpic');if(!b)return;let im=$('bgimg');if(IMGS.bg){if(!im){im=document.createElement('img');im.id='bgimg';im.alt='';b.appendChild(im)}im.src=IMGS.bg;b.classList.add('custom')}}
+ else svRender();
+}
+function imgReset(k){
+ delete IMGS[k];
+ if(IMGDEF[k])IMGDEF[k].el.src=DEFIMG[k];
+ else if(k==='bg'){const im=$('bgimg');if(im)im.remove();$('bgpic').classList.remove('custom')}
+ else svRender();
+ imgSave();toast(imgCfg(k).label+' reset to original');
+}
+function imgCtl(){
+ document.querySelectorAll('.page .imgbar').forEach(e=>e.remove());
+ if(!isAdmin)return;
+ Object.keys(IMGDEF).forEach(k=>{const el=IMGDEF[k].el,anchor=k==='logo'?el.parentNode:el,d=document.createElement('div');d.className='imgbar';d.innerHTML=`<span>${IMGDEF[k].label}</span><button class="btn o" data-ipick="${k}">📷 Replace picture</button><button class="btn o" data-ireset="${k}">↺ Original</button>`;anchor.insertAdjacentElement('afterend',d)});
+}
+Object.keys(IMGS).forEach(k=>{if(!k.startsWith('sv:'))imgApply(k)});
+const imgIn=document.createElement('input');imgIn.type='file';imgIn.accept='image/*';imgIn.hidden=true;document.body.appendChild(imgIn);
+let imgKey='';
+imgIn.onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f||!imgKey)return;const k=imgKey,cfg=imgCfg(k),r=new FileReader();
+ r.onload=()=>{const im=new Image();
+  im.onload=()=>{const sc=Math.min(1,cfg.w/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*sc)),h=Math.max(1,Math.round(im.height*sc)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');if(!cfg.png){g.fillStyle='#fff';g.fillRect(0,0,w,h)}g.drawImage(im,0,0,w,h);IMGS[k]=cv.toDataURL(cfg.png?'image/png':'image/jpeg',.85);imgApply(k);imgSave();toast(cfg.label+' updated')};
+  im.onerror=()=>toast('Could not read that image');im.src=r.result};
+ r.readAsDataURL(f)};
+document.addEventListener('click',e=>{if(!isAdmin)return;let b;
+ if(b=e.target.closest('[data-ipick]')){imgKey=b.dataset.ipick;imgIn.click();return}
+ if(b=e.target.closest('[data-ireset]')){imgReset(b.dataset.ireset);return}
+ if(b=e.target.closest('[data-svpick]')){imgKey='sv:'+SV[b.dataset.svpick][0];imgIn.click();return}
+ if(b=e.target.closest('[data-svreset]')){imgReset('sv:'+SV[b.dataset.svreset][0]);return}
+});
+
+/* ---- projects (admin only) ---- */
+const PST={ongoing:'On-going',completed:'Completed',negotiation:'Under negotiation'};
+let PRJ={base:(typeof BAKEDPC==='number'?BAKEDPC:67),list:[]},PRJ_has=false,prjF='all';
+try{const l=JSON.parse(localStorage.getItem('nhj_prj')||'null');if(l&&Array.isArray(l.list)){PRJ={base:Math.max(0,Math.round(+l.base)||0),list:l.list.map(x=>({n:String(x.n||''),c:String(x.c||''),s:PST[x.s]?x.s:'ongoing',p:Math.max(0,+x.p||0),m:Math.max(0,+x.m||0),l:Math.max(0,+x.l||0),t:Math.max(0,+x.t||0)}))};PRJ_has=true}}catch(e){}
+function completedTotal(){return PRJ_has?PRJ.base+PRJ.list.filter(x=>x.s==='completed').length:(typeof BAKEDPC==='number'?BAKEDPC:67)}
+const prjProfit=x=>x.p-x.m-x.l-x.t,pesoS=v=>(v<0?'-':'')+peso(Math.abs(v));
+function prjSave(){PRJ_has=true;try{localStorage.setItem('nhj_prj',JSON.stringify(PRJ));flashSaved()}catch(e){toast('Could not save projects in this browser')}}
+function prjKpi(){
+ const t={ongoing:[0,0],completed:[0,0],negotiation:[0,0]};PRJ.list.forEach(x=>{t[x.s][0]++;t[x.s][1]+=x.p});
+ const sum=(f,a)=>a.reduce((n,x)=>n+f(x),0),done=PRJ.list.filter(x=>x.s==='completed');
+ const all=sum(x=>x.p,PRJ.list),mat=sum(x=>x.m,PRJ.list),lab=sum(x=>x.l,PRJ.list),tax=sum(x=>x.t,PRJ.list),pr=sum(prjProfit,PRJ.list);
+ $('prjKpi').innerHTML=[['g','Completed',t.completed],['b','On-going',t.ongoing],['y','Under negotiation',t.negotiation]].map(a=>`<div class="card k ${a[0]}"><div class="l">${a[1]}</div><div class="v">${a[2][0]}</div><small>${peso(a[2][1])}</small></div>`).join('')
+  +`<div class="card k"><div class="l">All projects · total contract price</div><div class="v">${peso(all)}</div><small>${PRJ.list.length} project(s)</small></div>`
+  +`<div class="card k"><div class="l">Material expenses</div><div class="v">${peso(mat)}</div><small>Completed: ${peso(sum(x=>x.m,done))}</small></div>`
+  +`<div class="card k"><div class="l">Labor cost</div><div class="v">${peso(lab)}</div><small>Completed: ${peso(sum(x=>x.l,done))}</small></div>`
+  +`<div class="card k"><div class="l">Tax</div><div class="v">${peso(tax)}</div><small>Completed: ${peso(sum(x=>x.t,done))}</small></div>`
+  +`<div class="card k ${pr<0?'':'g'}"><div class="l">Profit</div><div class="v"${pr<0?' style="color:#e5484d"':''}>${pesoS(pr)}</div><small>Completed: ${pesoS(sum(prjProfit,done))}</small></div>`
+  +`<div class="card k g"><div class="l">Completed counter on Home page</div><div class="v">${completedTotal()}+</div><small>${PRJ.base} before this list + ${t.completed[0]} completed here</small></div>`;
+ $('cnt').textContent=completedTotal();
+}
+function prjRender(){
+ if(document.activeElement!==$('prjBase'))$('prjBase').value=PRJ.base;
+ $('prjFil').value=prjF;
+ const rows=PRJ.list.map((x,i)=>[x,i]).filter(a=>prjF==='all'||a[0].s===prjF);
+ $('prjBody').innerHTML=rows.length?`<table class="prj"><thead><tr><th>#</th><th>Project name</th><th>Client / location</th><th>Status</th><th>Contract price (₱)</th><th>Material expenses (₱)</th><th>Labor cost (₱)</th><th>Tax (₱)</th><th>Profit (₱)</th><th></th></tr></thead><tbody>${rows.map((a,n)=>{const x=a[0],i=a[1];return `<tr class="s-${x.s}"><td>${n+1}</td><td><input data-pi="${i}" data-pf="n" value="${escH(x.n)}" placeholder="Project name" aria-label="Project name"></td><td><input data-pi="${i}" data-pf="c" value="${escH(x.c)}" placeholder="Client / location" aria-label="Client or location"></td><td><select data-pi="${i}" data-pf="s" aria-label="Status">${Object.keys(PST).map(k=>`<option value="${k}"${x.s===k?' selected':''}>${PST[k]}</option>`).join('')}</select></td><td><input type="number" min="0" step="1000" data-pi="${i}" data-pf="p" value="${x.p}" aria-label="Contract price"></td><td><input type="number" min="0" step="1000" data-pi="${i}" data-pf="m" value="${x.m}" aria-label="Material expenses"></td><td><input type="number" min="0" step="1000" data-pi="${i}" data-pf="l" value="${x.l}" aria-label="Labor cost"></td><td><input type="number" min="0" step="1000" data-pi="${i}" data-pf="t" value="${x.t}" aria-label="Tax"></td><td class="pf ${prjProfit(x)<0?'neg':'pos'}" data-pprofit="${i}">${pesoS(prjProfit(x))}</td><td><button class="btn o" data-pdelp="${i}">🗑</button></td></tr>`}).join('')}</tbody></table>`
+  :'<p>'+(PRJ.list.length?'No projects with this status.':'No projects yet – tap “＋ Add project”.')+'</p>';
+ prjKpi();
+}
+$('prjBody').addEventListener('input',e=>{const t=e.target,i=t.dataset.pi,f=t.dataset.pf;if(i===undefined||!PRJ.list[i])return;
+ if(f==='p'||f==='m'||f==='l'||f==='t')PRJ.list[i][f]=Math.max(0,+t.value||0);else PRJ.list[i][f]=t.value;
+ prjSave();if(f==='s'){prjRender();return}
+ if(f==='p'||f==='m'||f==='l'||f==='t'){const c=$('prjBody').querySelector('[data-pprofit="'+i+'"]'),v=prjProfit(PRJ.list[i]);if(c){c.textContent=pesoS(v);c.classList.toggle('neg',v<0);c.classList.toggle('pos',v>=0)}}
+ prjKpi()});
+$('prjBody').addEventListener('click',e=>{const d=e.target.closest('[data-pdelp]');if(!d)return;
+ if(d.dataset.sure!=='1'){d.dataset.sure='1';d.textContent='⚠ Tap again';d.style.color='#e5484d';d.style.borderColor='#e5484d';setTimeout(()=>{if(d.isConnected){d.dataset.sure='';d.textContent='🗑';d.style.color='';d.style.borderColor=''}},3500);return}
+ PRJ.list.splice(+d.dataset.pdelp,1);prjSave();prjRender();toast('Project deleted')});
+$('prjAdd').onclick=()=>{PRJ.list.push({n:'',c:'',s:'ongoing',p:0,m:0,l:0,t:0});if(prjF!=='all'&&prjF!=='ongoing')prjF='all';prjSave();prjRender();const ins=$('prjBody').querySelectorAll('input[data-pf="n"]');if(ins.length)ins[ins.length-1].focus()};
+$('prjFil').onchange=()=>{prjF=$('prjFil').value;prjRender()};
+$('prjBase').oninput=()=>{PRJ.base=Math.max(0,Math.round(+$('prjBase').value)||0);prjSave();prjKpi()};
+$('prjCsv').onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"';const t=[['Project','Client / location','Status','Contract price (PHP)','Material expenses (PHP)','Labor cost (PHP)','Tax (PHP)','Profit (PHP)'].map(q).join(',')].concat(PRJ.list.map(x=>[q(x.n),q(x.c),q(PST[x.s]),x.p,x.m,x.l,x.t,prjProfit(x)].join(',')));saveFile('nhj-projects.csv','\ufeff'+t.join('\r\n'),'text/csv')};
 count();calc();rows();cartUI();applyAdmin();
 </script>
 </body>
